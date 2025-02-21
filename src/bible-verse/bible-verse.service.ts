@@ -1,10 +1,31 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+import { WebhookPayload } from './interfaces/webhook-payload.interface';
 
 @Injectable()
 export class BibleVerseService {
   constructor(private httpService: HttpService) {}
+
+  // Method for sending Bible verse to channel
+  async sendVerseToChannel(channelId: string, settings: any): Promise<void> {
+    try {
+      const verse = await this.getFormattedVerse(settings);
+      const webhookUrl = `https://ping.telex.im/v1/webhooks/${channelId}`;
+
+      const payload: WebhookPayload = {
+        event_name: 'Daily Bible Verse',
+        message: verse,
+        status: 'success',
+        username: 'Bible Verse Bot',
+      };
+
+      await firstValueFrom(this.httpService.post(webhookUrl, payload));
+    } catch (error) {
+      console.error('Error sending verse to channel:', error.message);
+      throw error;
+    }
+  }
 
   // Method for formatted verse
   async getFormattedVerse(settings): Promise<string> {
