@@ -29,7 +29,7 @@ export class BibleVerseController {
             'https://i.postimg.cc/qqpSHdMt/Blue-Waves-Surfing-Club-Logo-3.png',
           app_name: 'Daily Bible Verse',
           app_url:
-            'https://tv43bl8t-3000.use.devtunnels.ms/bible-verse/integration-config',
+            'https://telex-bible-verse-bot.onrender.com/bible-verse/integration-config',
           background_color: '#6fd644',
         },
         integration_category: 'Communication & Collaboration',
