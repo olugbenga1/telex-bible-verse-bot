@@ -1,73 +1,84 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Daily Bible Verse Bot for Telex
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The Daily Bible Verse Bot is an interval integration for the Telex platform ([telex.im](https://telex.im)) that automatically posts Bible verses to Telex channels at scheduled intervals. This integration allows users to receive daily spiritual inspiration with customizable verse sources and translations.
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Scheduled Delivery**: Automatically sends verses at configured times.
+- **Customizable Sources**: Select verses from specific books (Psalms, Proverbs, Gospels) or themes (Hope, Comfort, Wisdom).
+- **Multiple Translations**: Support for various Bible translations (KJV, NIV, ESV, etc.).
+- **Formatted Messages**: Clean, readable message format with emoji and markdown formatting.
+
+## Technical Architecture
+
+The integration is built using:
+
+- **NestJS framework** for the backend service.
+- **Bible API** for fetching verse content from `https://bible-api.com/`
+- **Telex Webhook API** for delivering messages to channels.
+
+## Configuration Options
+
+Users can configure the following settings:
+
+- **Delivery Schedule**: Set specific times for verse delivery.
+- **Verse Source**: Choose from:
+  - **Books**: Psalms, Proverbs, Gospels.
+  - **Themes**: Hope, Comfort, Wisdom, Random.
+- **Translation**: Select preferred Bible translation ['NIV', 'ESV', 'KJV', 'NLT']
 
 ## Installation
 
+### Prerequisites
+
+- Node.js (v14+)
+- npm or yarn
+- Telex account with webhook credentials
+
+### Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/olugbenga1/telex-bible-verse-bot.git
+   cd telex-bible-verse-bot
+
+   ```
+
+2. Install dependencies
+
 ```bash
-$ npm install
+  npm install
 ```
 
-## Running the app
+#### Usage
 
-```bash
-# development
-$ npm run start
+Once installed and configured, the bot will automatically post verses to the configured Telex channel at the scheduled intervals.
 
-# watch mode
-$ npm run start:dev
+#### Example Message
 
-# production mode
-$ npm run start:prod
+```
+📖 *Daily Bible Verse* 📖
+
+"For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+
+*John 3:16*
 ```
 
-## Test
+### Development
+
+#### Running Tests
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run test
 ```
 
-## Support
+### How It Works
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+1. The scheduler triggers at configured intervals.
+1. The service selects an appropriate verse based on user's configuration settings.
+1. The verse is fetched from the Bible API.
+1. The message is formatted with appropriate styling.
+1. The formatted message is sent to the configured Telex channel via webhook.
