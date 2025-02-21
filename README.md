@@ -82,3 +82,4 @@ npm run test
 1. The verse is fetched from the Bible API.
 1. The message is formatted with appropriate styling.
 1. The formatted message is sent to the configured Telex channel via webhook.
+# telex-bible-verse-bot
