@@ -3,6 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { WebhookPayload } from './interfaces/webhook-payload.interface';
 import { FetchBibleSettings } from './interfaces/fetch-bible-settings.interface';
+import {
+  PassageResponse,
+  RandomVerseResponse,
+} from './interfaces/api-responses.interface';
+import { SourceInfo, VerseData } from './interfaces/verse-data.interface';
 
 @Injectable()
 export class BibleVerseService {
@@ -49,12 +54,12 @@ export class BibleVerseService {
   private async fetchBibleVerse(
     source: string,
     translation: string,
-  ): Promise<any> {
+  ): Promise<PassageResponse> {
     const sourceInfo = this.getPassageFromSource(source);
 
     // console.log(sourceInfo);
 
-    let apiUrl;
+    let apiUrl: string;
     if (sourceInfo.useRandomEndpoint) {
       if (sourceInfo.bookIds && sourceInfo.bookIds.length > 0) {
         // Use filtered random verses from specific books
@@ -71,18 +76,19 @@ export class BibleVerseService {
     }
 
     try {
-      const response = await firstValueFrom(this.httpService.get(apiUrl));
-
-      //   console.log(apiUrl, response.data);
+      const response = await firstValueFrom(
+        this.httpService.get<RandomVerseResponse | PassageResponse>(apiUrl),
+      );
 
       // Transform the response from random endpoint to match the format from specific passage endpoint
-      if (sourceInfo.useRandomEndpoint && response.data.random_verse) {
-        const randomVerse = response.data.random_verse;
+      if (sourceInfo.useRandomEndpoint && 'random_verse' in response.data) {
+        const randomData = response.data as RandomVerseResponse;
+        const randomVerse = randomData.random_verse;
         // Return in the same format as the specific passage endpoint
-        const randomResponse = {
+        const randomResponse: PassageResponse = {
           reference: `${randomVerse.book} ${randomVerse.chapter}:${randomVerse.verse}`,
           text: randomVerse.text,
-          translation: response.data.translation,
+          translation: randomData.translation,
           verses: [
             {
               book_id: randomVerse.book_id,
@@ -93,11 +99,9 @@ export class BibleVerseService {
             },
           ],
         };
-        // console.log('Random response', randomResponse);
         return randomResponse;
       }
-      //   console.log('Not Random response', response.data);
-      return response.data;
+      return response.data as PassageResponse;
     } catch (error) {
       console.error('Error fetching Bible verse from apiUrl:', error.message);
       throw error;
@@ -105,7 +109,7 @@ export class BibleVerseService {
   }
 
   // Format the verse to work well with webhooks
-  private formatVerseMessage(verseData: any): string {
+  private formatVerseMessage(verseData: VerseData): string {
     if (!verseData || !verseData.verses || verseData.verses.length === 0) {
       return 'No Bible verse found for the provided settings.';
     }
@@ -118,11 +122,7 @@ export class BibleVerseService {
     return message;
   }
 
-  private getPassageFromSource(source: string): {
-    passage: string;
-    useRandomEndpoint: boolean;
-    bookIds?: string[];
-  } {
+  private getPassageFromSource(source: string): SourceInfo {
     // For category-based random selection that can use API's filtered random endpoint
     switch (source) {
       case 'Psalms':
