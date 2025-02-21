@@ -1,8 +1,10 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { IntegrationConfig } from './interfaces/integration-config.interface';
 import { BibleVerseService } from './bible-verse.service';
 import { Request } from 'express';
+import { firstValueFrom } from 'rxjs';
+import { WebhookPayload } from './interfaces/webhook-payload.interface';
 
 @Controller('bible-verse')
 export class BibleVerseController {
@@ -93,5 +95,72 @@ export class BibleVerseController {
         target_url: null,
       },
     };
+  }
+
+  async checkSiteStatus(site: string): Promise<string | null> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(site, { timeout: 10000 }),
+      );
+      if (response.status < 400) {
+        return null;
+      }
+      return `${site} is down (status ${response.status})`;
+    } catch (err) {
+      return `${site} is down (error: ${err.message})`;
+    }
+  }
+
+  async monitorTask(payload): Promise<void> {
+    const sites = payload.settings
+      .filter((s) => s.label.startsWith('site'))
+      .map((s) => s.default);
+    const results = await Promise.all(
+      sites.map((site) => this.checkSiteStatus(site)),
+    );
+
+    const message = results.filter((result) => result !== null).join('\n');
+    if (!message) return;
+
+    const data: WebhookPayload = {
+      message,
+      username: 'Uptime Monitor',
+      event_name: 'Uptime Check',
+      status: 'failure',
+    };
+
+    await firstValueFrom(this.httpService.post(payload.return_url, data));
+  }
+
+  @Post('tick')
+  async postVerse(@Body() body): Promise<any> {
+    try {
+      // Extract return URL and channel ID from Telex request
+      const { return_url, channel_id, settings } = body;
+
+      if (!return_url && !channel_id) {
+        return {
+          success: false,
+          message: 'No return URL or channel ID provided',
+        };
+      }
+
+      const verseSettings = {
+        Source: settings?.Source || 'Random',
+        Translation: settings?.Translation || 'kjv',
+        Delivery_Time: settings?.['Delivery Time'] || '0 8 * * *',
+      };
+
+      // Send verse to channel
+
+      await this.bibleVerseService.sendVerseToChannel(
+        channel_id,
+        verseSettings,
+      );
+      return { status: 'success' };
+    } catch (error) {
+      console.error('Error processing tick:', error);
+      return { success: false, message: error.message };
+    }
   }
 }

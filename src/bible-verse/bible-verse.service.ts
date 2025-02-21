@@ -2,13 +2,17 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { WebhookPayload } from './interfaces/webhook-payload.interface';
+import { FetchBibleSettings } from './interfaces/fetch-bible-settings.interface';
 
 @Injectable()
 export class BibleVerseService {
   constructor(private httpService: HttpService) {}
 
   // Method for sending Bible verse to channel
-  async sendVerseToChannel(channelId: string, settings: any): Promise<void> {
+  async sendVerseToChannel(
+    channelId: string,
+    settings: FetchBibleSettings,
+  ): Promise<void> {
     try {
       const verse = await this.getFormattedVerse(settings);
       const webhookUrl = `https://ping.telex.im/v1/webhooks/${channelId}`;
@@ -28,7 +32,7 @@ export class BibleVerseService {
   }
 
   // Method for formatted verse
-  async getFormattedVerse(settings): Promise<string> {
+  async getFormattedVerse(settings: FetchBibleSettings): Promise<string> {
     try {
       const verse = await this.fetchBibleVerse(
         settings.Source,
