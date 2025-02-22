@@ -58,7 +58,7 @@ export class BibleVerseController {
             label: 'Delivery Time',
             type: 'dropdown',
             required: true,
-            default: '52 9 * * *',
+            default: '55 9 * * *',
             options: [
               '0 6 * * *',
               '0 8 * * *',
@@ -66,8 +66,8 @@ export class BibleVerseController {
               '0 12 * * *',
               '0 18 * * *',
               '0 21 * * *',
-              '50 9 * * *',
-              '42 16 * * *',,
+              '55 9 * * *',
+              '00 17 * * *',,
             ],
           },
           {
