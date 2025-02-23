@@ -43,7 +43,8 @@ export class BibleVerseService {
         settings.Source,
         settings.Translation,
       );
-      return this.formatVerseMessage(verse);
+      const response = this.formatVerseMessage(verse);
+      return response;
     } catch (error) {
       console.error('Error getting formatted verse:');
       throw error;
@@ -56,8 +57,6 @@ export class BibleVerseService {
     translation: string,
   ): Promise<PassageResponse> {
     const sourceInfo = this.getPassageFromSource(source);
-
-    // console.log(sourceInfo);
 
     let apiUrl: string;
     if (sourceInfo.useRandomEndpoint) {

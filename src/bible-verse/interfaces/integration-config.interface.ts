@@ -41,6 +41,6 @@ export interface IntegrationConfig {
       },
     ];
     tick_url: string;
-    target_url: null;
+    target_url: string | null;
   };
 }
