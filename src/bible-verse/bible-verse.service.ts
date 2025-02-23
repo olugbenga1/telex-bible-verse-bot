@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { WebhookPayload } from './interfaces/webhook-payload.interface';
-import { FetchBibleSettings } from './interfaces/fetch-bible-settings.interface';
+import { FetchVerseSettings } from './interfaces/fetch-verse-settings.interface';
 import {
   PassageResponse,
   RandomVerseResponse,
@@ -16,7 +16,7 @@ export class BibleVerseService {
   // Method for sending Bible verse to channel
   async sendVerseToChannel(
     channelId: string,
-    settings: FetchBibleSettings,
+    settings: FetchVerseSettings,
   ): Promise<void> {
     try {
       const verse = await this.getFormattedVerse(settings);
@@ -37,7 +37,7 @@ export class BibleVerseService {
   }
 
   // Method for formatted verse
-  async getFormattedVerse(settings: FetchBibleSettings): Promise<string> {
+  async getFormattedVerse(settings: FetchVerseSettings): Promise<string> {
     try {
       const verse = await this.fetchBibleVerse(
         settings.Source,

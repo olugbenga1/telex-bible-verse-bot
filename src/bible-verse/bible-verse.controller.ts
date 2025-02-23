@@ -5,6 +5,7 @@ import { BibleVerseService } from './bible-verse.service';
 import { Request } from 'express';
 import { TelexTickRequest } from './interfaces/telex-tick-request.interface';
 import { TelexResponse } from './interfaces/telex-response.interface';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('bible-verse')
 export class BibleVerseController {
@@ -58,7 +59,7 @@ export class BibleVerseController {
             label: 'Delivery Time',
             type: 'dropdown',
             required: true,
-            default: '55 9 * * *',
+            default: '15 3 * * *',
             options: [
               '0 6 * * *',
               '0 8 * * *',
@@ -66,10 +67,9 @@ export class BibleVerseController {
               '0 12 * * *',
               '0 18 * * *',
               '0 21 * * *',
-              '29 10 * * *',
-              '27 17 * * *',
-              '25 17 * * *',
-              '22 10 * * *',
+              '5 3 * * *',
+              '7 3 * * *',
+              '10 10 * * *',
             ],
           },
           {
@@ -122,10 +122,14 @@ export class BibleVerseController {
 
       // Send verse to channel
 
-      await this.bibleVerseService.sendVerseToChannel(
+      const data = await this.bibleVerseService.sendVerseToChannel(
         channel_id,
         verseSettings,
       );
+
+      // Send Telex response to Telex
+      await firstValueFrom(this.httpService.post(body.return_url, data));
+
       return { success: true };
     } catch (error) {
       console.error('Error processing tick:', error);
